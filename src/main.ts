@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
-import { HttpExceptionFilter } from './common/exception/http-exception.filter';
+import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
 
 const fs = require('fs');
 async function bootstrap() {

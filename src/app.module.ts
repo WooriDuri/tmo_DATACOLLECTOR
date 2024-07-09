@@ -4,7 +4,9 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
+import { SeedModule } from './seed/seed.module';
 import typeorm from './config/typeorm.config';
+import { Champion } from './entity/champion.entity';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import typeorm from './config/typeorm.config';
         maxRedirects: 3,
       }),
     }),
+    TypeOrmModule.forFeature([Champion]),
+    SeedModule,
   ],
   controllers: [AppController],
   providers: [AppService],
