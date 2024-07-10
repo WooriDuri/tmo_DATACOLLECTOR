@@ -13,7 +13,12 @@ export class SeedController {
   }
 
   @Post('item')
-  async insertItemData() {
+  async insertItemData(): Promise<ItemEntity[]> {
     return this.seedService.insertItemData();
+  }
+
+  @Post('test')
+  async test() {
+    return this.seedService.test();
   }
 }

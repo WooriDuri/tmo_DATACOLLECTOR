@@ -10,4 +10,7 @@ export class ItemEntity extends EntityContent {
   name: string;
   @Column({ type: 'tinyint', nullable: false })
   into: number;
+
+  @Column({ type: 'int', nullable: true })
+  gold: number;
 }
