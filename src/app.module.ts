@@ -7,6 +7,8 @@ import { HttpModule } from '@nestjs/axios';
 import { SeedModule } from './seed/seed.module';
 import typeorm from './config/typeorm.config';
 import { Champion } from './entity/champion.entity';
+import { ItemEntity } from './entity/item.entity';
+import { SpellEntity } from './entity/spell.entity';
 
 @Module({
   imports: [
@@ -26,7 +28,7 @@ import { Champion } from './entity/champion.entity';
         maxRedirects: 3,
       }),
     }),
-    TypeOrmModule.forFeature([Champion]),
+    TypeOrmModule.forFeature([Champion, ItemEntity, SpellEntity]),
     SeedModule,
   ],
   controllers: [AppController],

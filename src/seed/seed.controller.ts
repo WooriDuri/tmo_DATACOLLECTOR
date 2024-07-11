@@ -17,6 +17,11 @@ export class SeedController {
     return this.seedService.insertItemData();
   }
 
+  @Post('spell')
+  async insertSpellData() {
+    return this.seedService.insertSpellData();
+  }
+
   @Post('test')
   async test() {
     return this.seedService.test();

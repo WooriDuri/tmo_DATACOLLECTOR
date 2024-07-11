@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { EntityContent } from './content';
+import { ChampItemEntity } from './champ_item.entity';
 
 @Entity({ name: 'item' })
 export class ItemEntity extends EntityContent {
@@ -13,4 +14,7 @@ export class ItemEntity extends EntityContent {
 
   @Column({ type: 'int', nullable: true })
   gold: number;
+
+  @OneToMany(() => ChampItemEntity, (champItem) => champItem.item)
+  champItems: ChampItemEntity[];
 }

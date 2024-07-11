@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpExceptionFilter } from 'src/common/exceptions/http-exception.filter';
 import { Champion } from 'src/entity/champion.entity';
@@ -7,7 +7,9 @@ import * as itemData from './item.json';
 import * as championData from './champion.json';
 import * as timelineData from './timeline.json';
 import * as matchData from './match.json';
+import * as spellData from './spell.json';
 import { ItemEntity } from 'src/entity/item.entity';
+import { SpellEntity } from 'src/entity/spell.entity';
 
 @Injectable()
 export class SeedService {
@@ -16,6 +18,8 @@ export class SeedService {
     private readonly championRepository: Repository<Champion>,
     @InjectRepository(ItemEntity)
     private readonly itemRepository: Repository<ItemEntity>,
+    @InjectRepository(SpellEntity)
+    private readonly spellRepository: Repository<SpellEntity>,
   ) {}
 
   async insertData(): Promise<Champion[]> {
@@ -52,6 +56,21 @@ export class SeedService {
     }
   }
 
+  async insertSpellData() {
+    try {
+      const spells = Object.entries(spellData.data).map(([id, value]) => {
+        return {
+          spell_id: Number(value.key),
+          name: value.name,
+        };
+      });
+      return await this.spellRepository.save(spells);
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(error, error.status || 500);
+    }
+  }
+
   async test() {
     try {
       const matchid = matchData.metadata.matchId;
@@ -81,7 +100,7 @@ export class SeedService {
         participantsMap[participant.participantId] = {
           participant_id: participant.participantId,
           champion_id: participant.championId,
-          lane: participant.individualPosition,
+          lane: participant.role,
         };
       });
       console.log(matchid, participantsMap);
@@ -121,6 +140,7 @@ export class SeedService {
       });
       // console.log(itemtest);
       console.log(groupedEvents.SKILL_LEVEL_UP);
+      //* champion_id , skill[], vs_champion_id
       const skillGroupedData = groupedEvents.SKILL_LEVEL_UP.reduce(
         (acc, curr) => {
           const { participantId, skillSlot } = curr;
@@ -153,20 +173,6 @@ export class SeedService {
         };
       });
       console.log(dbskill); // 디비에 넣기 좋게 만듬
-      const skilltest = groupedEvents.SKILL_LEVEL_UP.map((skill) => {
-        let target;
-        if (Number(skill.participantId) > 5) {
-          target = Number(skill.participantId) - 5;
-        } else {
-          target = Number(skill.participantId) + 5;
-        }
-        return {
-          champion_id: participantsMap[skill.participantId].champion_id,
-          skill: skill.skillSlot,
-          timestamp: skill.timestamp,
-          vs_champion_id: participantsMap[target].champion_id,
-        };
-      });
 
       return groupedEvents;
     } catch (error) {
