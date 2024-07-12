@@ -1,10 +1,18 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { EntityContent } from './content';
 import { Champion } from './champion.entity';
 import { ItemEntity } from './item.entity';
 
 @Entity({ name: 'champItem' })
 export class ChampItemEntity extends EntityContent {
+  @PrimaryGeneratedColumn()
+  id: number;
   @Column({ type: 'int', nullable: false })
   champ_id: number;
 

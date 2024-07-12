@@ -95,6 +95,7 @@ export class SeedService {
       //   '9': { participant_id: 9, champion_id: 360, lane: 'BOTTOM' },
       //   '10': { participant_id: 10, champion_id: 111, lane: 'UTILITY' }
       // }
+
       const participantsMap = {};
       test.forEach((participant) => {
         participantsMap[participant.participantId] = {
@@ -103,14 +104,14 @@ export class SeedService {
           lane: participant.role,
         };
       });
-      console.log(matchid, participantsMap);
+      // console.log(matchid, participantsMap);
 
       const allEvents = timelineData.info.frames.reduce(
         (acc, frame) => acc.concat(frame.events),
         [],
       );
 
-      console.log(allEvents); // 모든 event들을 다 가져옴
+      // console.log(allEvents); // 모든 event들을 다 가져옴
       const groupedEvents = allEvents.reduce((acc, event) => {
         if (!acc[event.type]) {
           acc[event.type] = [];
@@ -120,7 +121,7 @@ export class SeedService {
       }, {}); // event type 별로 그룹핑
 
       const sortedKeys = Object.keys(groupedEvents).sort(); // event type 별로 정렬
-      console.log(sortedKeys);
+      // console.log(sortedKeys);
 
       //* item db에 넣기 좋게 만듬
       const itemtest = groupedEvents.ITEM_PURCHASED.map((item) => {
@@ -139,7 +140,7 @@ export class SeedService {
         };
       });
       // console.log(itemtest);
-      console.log(groupedEvents.SKILL_LEVEL_UP);
+      // console.log(groupedEvents.SKILL_LEVEL_UP);
       //* champion_id , skill[], vs_champion_id
       const skillGroupedData = groupedEvents.SKILL_LEVEL_UP.reduce(
         (acc, curr) => {
@@ -157,7 +158,7 @@ export class SeedService {
         },
         {},
       );
-      console.log(skillGroupedData); // skill level up event를 participantId 별로 그룹핑
+      // console.log(skillGroupedData); // skill level up event를 participantId 별로 그룹핑
 
       const dbskill = Object.entries(skillGroupedData).map(([key, value]) => {
         let target;
@@ -172,7 +173,44 @@ export class SeedService {
           vs_champion_id: participantsMap[target].champion_id,
         };
       });
-      console.log(dbskill); // 디비에 넣기 좋게 만듬
+      // console.log(dbskill); // 디비에 넣기 좋게 만듬
+
+      const winYn = test.map((participant) => {
+        let target;
+        if (Number(participant.participantId) > 5) {
+          target = Number(participant.participantId) - 5;
+        } else {
+          target = Number(participant.participantId) + 5;
+        }
+        return {
+          champion_id: participant.championId,
+          win: participant.win,
+          vs_champion_id: participantsMap[target].champion_id,
+        };
+      });
+      console.log(winYn); // 승패 여부
+
+      const rune = test.map((participant) => {
+        let target;
+        if (Number(participant.participantId) > 5) {
+          target = Number(participant.participantId) - 5;
+        } else {
+          target = Number(participant.participantId) + 5;
+        }
+        return {
+          champion_id: participantsMap[participant.participantId].champion_id,
+          primary_rune: participant.perks.styles[0].selections.map(
+            (selection) => selection.perk,
+          ),
+          primary_style: participant.perks.styles[0].style,
+          secondary_rune: participant.perks.styles[1].selections.map(
+            (selection) => selection.perk,
+          ),
+          secondary_style: participant.perks.styles[1].style,
+          vs_champion_id: participantsMap[target].champion_id,
+        };
+      });
+      console.log(rune); // 룬 정보
 
       return groupedEvents;
     } catch (error) {

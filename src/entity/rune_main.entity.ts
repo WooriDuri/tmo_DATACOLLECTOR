@@ -8,8 +8,8 @@ import {
 import { EntityContent } from './content';
 import { Champion } from './champion.entity';
 
-@Entity({ name: 'champSkill' })
-export class ChampSkillEntity extends EntityContent {
+@Entity({ name: 'runeMain' })
+export class RuneMainEntity extends EntityContent {
   @PrimaryGeneratedColumn()
   id: number;
   @Column({ type: 'int', nullable: false })
@@ -19,13 +19,22 @@ export class ChampSkillEntity extends EntityContent {
   vs_champ_id: number;
 
   @Column('simple-array', { nullable: false })
-  skills: number[];
+  primary_rune: number[];
 
-  @ManyToOne(() => Champion, (champion) => champion.champSkills)
+  @Column({ type: 'int', nullable: false })
+  primary_style: number;
+
+  @Column('simple-array', { nullable: false })
+  secondary_rune: number[];
+
+  @Column({ type: 'int', nullable: false })
+  secondary_style: number;
+
+  @ManyToOne(() => Champion, (champion) => champion.runeMains)
   @JoinColumn({ name: 'champ_id' })
   champion: Champion;
 
-  @ManyToOne(() => Champion, (champion) => champion.vsChampSkills)
+  @ManyToOne(() => Champion, (champion) => champion.vsRuneMains)
   @JoinColumn({ name: 'vs_champ_id' })
   vsChampion: Champion;
 }
