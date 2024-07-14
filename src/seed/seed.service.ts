@@ -1,4 +1,9 @@
-import { HttpException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpExceptionFilter } from 'src/common/exceptions/http-exception.filter';
 import { Champion } from 'src/entity/champion.entity';
@@ -10,9 +15,16 @@ import * as matchData from './match.json';
 import * as spellData from './spell.json';
 import { ItemEntity } from 'src/entity/item.entity';
 import { SpellEntity } from 'src/entity/spell.entity';
+import { ConfigService } from '@nestjs/config';
+import { map } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class SeedService {
+  headers;
+  riotApiKey;
+  gameName;
+  tagLine;
   constructor(
     @InjectRepository(Champion)
     private readonly championRepository: Repository<Champion>,
@@ -20,7 +32,18 @@ export class SeedService {
     private readonly itemRepository: Repository<ItemEntity>,
     @InjectRepository(SpellEntity)
     private readonly spellRepository: Repository<SpellEntity>,
-  ) {}
+    private readonly configService: ConfigService,
+    private readonly httpService: HttpService,
+  ) {
+    this.riotApiKey = this.configService.get('RIOT_API_KEY');
+    this.gameName = `아 말걸어서 죽음`;
+    this.tagLine = `KR1`;
+    this.headers = {
+      headers: {
+        Authorization: this.configService.get('RIOT_API_KEY'),
+      },
+    };
+  }
 
   async insertData(): Promise<Champion[]> {
     try {
@@ -101,7 +124,7 @@ export class SeedService {
         participantsMap[participant.participantId] = {
           participant_id: participant.participantId,
           champion_id: participant.championId,
-          lane: participant.role,
+          lane: participant.individualPosition,
         };
       });
       // console.log(matchid, participantsMap);
@@ -213,6 +236,32 @@ export class SeedService {
       console.log(rune); // 룬 정보
 
       return groupedEvents;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(error, error.status || 500);
+    }
+  }
+
+  async test2() {
+    try {
+      console.log(this.riotApiKey, this.gameName, this.tagLine);
+      return this.httpService
+        .get(
+          `https://asia.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${this.gameName}/${this.tagLine}?api_key=${this.riotApiKey}`,
+        )
+        .pipe(
+          map((response) => {
+            console.log(response.data);
+            if (response.status != 200) {
+              if (response.data.error_description) {
+                throw new BadRequestException(response.data.error_description);
+              } else {
+                throw new BadRequestException();
+              }
+            }
+            return response.data;
+          }),
+        );
     } catch (error) {
       console.log(error);
       throw new HttpException(error, error.status || 500);

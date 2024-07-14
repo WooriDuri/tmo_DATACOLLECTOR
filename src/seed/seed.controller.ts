@@ -1,4 +1,4 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { SeedService } from './seed.service';
 import { Champion } from 'src/entity/champion.entity';
 import { ItemEntity } from 'src/entity/item.entity';
@@ -25,5 +25,10 @@ export class SeedController {
   @Post('test')
   async test() {
     return this.seedService.test();
+  }
+
+  @Get('riot')
+  async getRiotData() {
+    return this.seedService.test2();
   }
 }
