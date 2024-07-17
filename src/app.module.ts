@@ -9,6 +9,7 @@ import typeorm from './config/typeorm.config';
 import { Champion } from './entity/champion.entity';
 import { ItemEntity } from './entity/item.entity';
 import { SpellEntity } from './entity/spell.entity';
+import { RiotModule } from './riot/riot.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { SpellEntity } from './entity/spell.entity';
     }),
     TypeOrmModule.forFeature([Champion, ItemEntity, SpellEntity]),
     SeedModule,
+    RiotModule,
   ],
   controllers: [AppController],
   providers: [AppService],
