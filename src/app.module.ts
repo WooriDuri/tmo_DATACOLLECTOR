@@ -10,6 +10,11 @@ import { Champion } from './entity/champion.entity';
 import { ItemEntity } from './entity/item.entity';
 import { SpellEntity } from './entity/spell.entity';
 import { RiotModule } from './riot/riot.module';
+import { ChampItemEntity } from './entity/champ_item.entity';
+import { ChampSkillEntity } from './entity/champ_skill.entity';
+import { ChampionWinEntity } from './entity/champion_win.entity';
+import { RuneMainEntity } from './entity/rune_main.entity';
+import { RuneStatEntity } from './entity/rune_stat.entity';
 
 @Module({
   imports: [
@@ -29,7 +34,16 @@ import { RiotModule } from './riot/riot.module';
         maxRedirects: 3,
       }),
     }),
-    TypeOrmModule.forFeature([Champion, ItemEntity, SpellEntity]),
+    TypeOrmModule.forFeature([
+      Champion,
+      ItemEntity,
+      SpellEntity,
+      ChampItemEntity,
+      ChampSkillEntity,
+      ChampionWinEntity,
+      RuneMainEntity,
+      RuneStatEntity,
+    ]),
     SeedModule,
     RiotModule,
   ],
