@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -15,6 +15,7 @@ import { ChampSkillEntity } from './entity/champ_skill.entity';
 import { ChampionWinEntity } from './entity/champion_win.entity';
 import { RuneMainEntity } from './entity/rune_main.entity';
 import { RuneStatEntity } from './entity/rune_stat.entity';
+import * as redisStore from 'cache-manager-ioredis';
 
 @Module({
   imports: [
@@ -22,6 +23,12 @@ import { RuneStatEntity } from './entity/rune_stat.entity';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [typeorm],
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      host: 'localhost',
+      port: 6379,
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
