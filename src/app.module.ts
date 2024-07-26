@@ -15,6 +15,11 @@ import { ChampSkillEntity } from './entity/champ_skill.entity';
 import { ChampionWinEntity } from './entity/champion_win.entity';
 import { RuneMainEntity } from './entity/rune_main.entity';
 import { RuneStatEntity } from './entity/rune_stat.entity';
+import { ChampionModule } from './champion/champion.module';
+import { ItemModule } from './item/item.module';
+import { RuneModule } from './rune/rune.module';
+import { SpellModule } from './spell/spell.module';
+import { SkillModule } from './skill/skill.module';
 import * as redisStore from 'cache-manager-ioredis';
 
 @Module({
@@ -53,6 +58,11 @@ import * as redisStore from 'cache-manager-ioredis';
     ]),
     SeedModule,
     RiotModule,
+    ChampionModule,
+    ItemModule,
+    RuneModule,
+    SpellModule,
+    SkillModule,
   ],
   controllers: [AppController],
   providers: [AppService],
