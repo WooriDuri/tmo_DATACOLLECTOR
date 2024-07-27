@@ -16,6 +16,7 @@ import { RuneService } from './rune/rune.service';
 
 @Injectable()
 export class AppService implements OnModuleInit {
+  called;
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly riotService: RiotService,
@@ -23,11 +24,19 @@ export class AppService implements OnModuleInit {
     private readonly skillService: SkillService,
     private readonly champService: ChampionService,
     private readonly runeService: RuneService,
-  ) {}
+  ) {
+    this.called = 0;
+  }
 
   async onModuleInit() {
-    // await this.cacheManager.del('summonerIds');
-    // await this.cacheManager.del('summonerCountAndLength');
+    // const getMatchList = await this.getCache<Array<string>>('matchesList');
+    // const getMatchInfo = await this.getCache<CountAndLength>(
+    //   'matchesCountAndLength',
+    // );
+    // console.log(getMatchList);
+    // console.log(getMatchList[getMatchInfo.count - 1]);
+    // console.log(getMatchList[getMatchInfo.count]);
+    // console.log(getMatchInfo);
     const getCachedSummoners = await this.getCache<Array<string>>(
       'summonerIds',
     );
@@ -48,7 +57,7 @@ export class AppService implements OnModuleInit {
       if (!getCachedSummonerInfo) {
         throw new HttpException('summonerCountAndLength is null', 500);
       }
-      if (getCachedSummonerInfo.count > getCachedSummonerInfo.length) {
+      if (getCachedSummonerInfo.count >= getCachedSummonerInfo.length) {
         await this.riotService.getEntries();
         // 갱신 후 getCachedSummonerInfo를 다시 가져와야함
         const updatedSummonerInfo = await this.getCache<CountAndLength>(
@@ -79,7 +88,10 @@ export class AppService implements OnModuleInit {
   async getMatchesByPuuid(puuid: string) {
     try {
       const existMatches = await this.getCache<Array<string>>('matchesList');
-      if (existMatches) {
+      const existMatchesInfo = await this.getCache<CountAndLength>(
+        'matchesCountAndLength',
+      );
+      if (existMatches && existMatchesInfo.count < existMatchesInfo.length) {
         return existMatches;
       }
       const matchesList = await this.riotService.getMatches(puuid);
@@ -98,10 +110,17 @@ export class AppService implements OnModuleInit {
   //* 라이엇 데이터 삽입
   async insertRiotData() {
     try {
+      console.log(this.called++);
       const matches = await this.getCache<Array<string>>('matchesList');
-      const getCachedMatchesInfo = await this.getCache<CountAndLength>(
+      let getCachedMatchesInfo = await this.getCache<CountAndLength>(
         'matchesCountAndLength',
       );
+      if (!getCachedMatchesInfo) {
+        await this.riotService.getEntries();
+        getCachedMatchesInfo = await this.getCache<CountAndLength>(
+          'matchesCountAndLength',
+        );
+      }
       const match = await this.riotService.getMatchDetail(
         matches[getCachedMatchesInfo.count],
       );
@@ -112,10 +131,10 @@ export class AppService implements OnModuleInit {
       await this.insertGroupByEvent(timeline);
       getCachedMatchesInfo.count++;
       await this.saveCache('matchesCountAndLength', getCachedMatchesInfo);
-      if (getCachedMatchesInfo.count <= getCachedMatchesInfo.length) {
+      if (getCachedMatchesInfo.count < getCachedMatchesInfo.length) {
         setTimeout(async () => {
           await this.insertRiotData();
-        }, 100);
+        }, 2000);
       } else {
         //다시 매치정보 가져오기
         const summoner = await this.getCache<Array<string>>('summonerIds');
@@ -211,6 +230,14 @@ export class AppService implements OnModuleInit {
     } catch (error) {
       console.log(error);
       return null;
+    }
+  }
+
+  async deleteCache(name: string) {
+    try {
+      return await this.cacheManager.del(name);
+    } catch (error) {
+      console.log(error);
     }
   }
   // async saveCache(name: string, value: any) {
