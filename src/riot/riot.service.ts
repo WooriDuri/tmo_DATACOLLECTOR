@@ -56,7 +56,7 @@ export class RiotService {
       await this.appService.saveCache('summonerIds', data);
       const countAndLength: CountAndLength = { count: 0, length: data.length };
       await this.appService.saveCache('summonerCountAndLength', countAndLength);
-      const test = await this.appService.getCache('summonerCountAndLength');
+      // const test = await this.appService.getCache('summonerCountAndLength');
       // console.log('test : ', test);
       // console.log('cached summonerIds : ', data);
       // console.log(this.tierCount);

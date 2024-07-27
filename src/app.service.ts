@@ -176,10 +176,11 @@ export class AppService implements OnModuleInit {
           lane: participant.individualPosition,
         };
       });
+      await this.saveCache('participantsMap', participantsMap);
       await this.champService.saveWin(matchData.info.participants);
       await this.runeService.insertRuneData(matchData.info.participants);
       await this.runeService.insertRuneStatData(matchData.info.participants);
-      return await this.saveCache('participantsMap', participantsMap);
+      return participantsMap;
       // const test = await this.getCache('participantsMap');
       // console.log(test);
     } catch (error) {
