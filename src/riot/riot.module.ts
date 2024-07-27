@@ -9,7 +9,7 @@ import { AppModule } from 'src/app.module';
     forwardRef(() => AppModule),
     HttpModule.registerAsync({
       useFactory: () => ({
-        timeout: 1000,
+        timeout: 3000,
         maxRedirects: 3,
       }),
     }),
