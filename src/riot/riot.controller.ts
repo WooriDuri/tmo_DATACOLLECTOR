@@ -16,8 +16,8 @@ export class RiotController {
   }
 
   @Get('matches')
-  async getMatch(@Body() body: { puuid: string }) {
-    return this.riotService.getMatch(body.puuid);
+  async getMatches(@Body() body: { puuid: string }) {
+    return this.riotService.getMatches(body.puuid);
   }
 
   @Get('match')

@@ -13,3 +13,8 @@ entity 총 두개 필요
 메인 룬 entity ->
 보조 룬 entity ->
 스펠 entity id, name -> champion_id , spell_id
+
+summonerId 배열, 카운트 캐싱
+
+summonerIds summoner array
+summonerCountAndLength summoner 카운트 및 길이

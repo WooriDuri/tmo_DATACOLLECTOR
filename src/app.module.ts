@@ -66,5 +66,6 @@ import * as redisStore from 'cache-manager-ioredis';
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [AppService],
 })
 export class AppModule {}

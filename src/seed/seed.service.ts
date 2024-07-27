@@ -96,8 +96,17 @@ export class SeedService {
 
   async test() {
     try {
+      console.log(matchData.info.participants);
       const matchid = matchData.metadata.matchId;
       const test = matchData.info.participants;
+      const participantsMap = {};
+      test.forEach((participant) => {
+        participantsMap[participant.participantId] = {
+          participant_id: participant.participantId,
+          champion_id: participant.championId,
+          lane: participant.individualPosition,
+        };
+      });
       // let participants = [];
       // test.map((participant) => {
       //   participants.push({
@@ -119,14 +128,6 @@ export class SeedService {
       //   '10': { participant_id: 10, champion_id: 111, lane: 'UTILITY' }
       // }
 
-      const participantsMap = {};
-      test.forEach((participant) => {
-        participantsMap[participant.participantId] = {
-          participant_id: participant.participantId,
-          champion_id: participant.championId,
-          lane: participant.individualPosition,
-        };
-      });
       // console.log(matchid, participantsMap);
 
       const allEvents = timelineData.info.frames.reduce(
