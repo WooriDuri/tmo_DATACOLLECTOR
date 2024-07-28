@@ -109,15 +109,9 @@ export class AppService implements OnModuleInit {
     }
   }
 
+  //* 호출하면 예외없이 바로 가져와야함. 다른데서 예외함.
   async getMatchesByPuuid(puuid: string) {
     try {
-      const existMatches = await this.getCache<Array<string>>('matchesList');
-      const existMatchesInfo = await this.getCache<CountAndLength>(
-        'matchesCountAndLength',
-      );
-      if (existMatches && existMatchesInfo.count < existMatchesInfo.length) {
-        return existMatches;
-      }
       const matchesList = await this.riotService.getMatches(puuid);
       await this.saveCache('matchesList', matchesList);
       const countAndLength: CountAndLength = {
