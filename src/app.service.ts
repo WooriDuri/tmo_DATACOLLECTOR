@@ -13,6 +13,8 @@ import { get } from 'http';
 import { SkillService } from './skill/skill.service';
 import { ChampionService } from './champion/champion.service';
 import { RuneService } from './rune/rune.service';
+import axiosRetry from 'axios-retry';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class AppService implements OnModuleInit {
@@ -24,11 +26,26 @@ export class AppService implements OnModuleInit {
     private readonly skillService: SkillService,
     private readonly champService: ChampionService,
     private readonly runeService: RuneService,
+    private readonly httpService: HttpService,
   ) {
     this.called = 0;
   }
 
   async onModuleInit() {
+    const axiosInstance = this.httpService.axiosRef;
+
+    // axios-retry 설정
+    axiosRetry(axiosInstance, {
+      retries: 3, // 재시도 횟수
+      retryCondition: (error) => {
+        // 재시도 조건
+        return error.code === 'ECONNABORTED' || error.response?.status >= 500;
+      },
+      retryDelay: (retryCount) => {
+        // 재시도 딜레이 (기본은 0)
+        return retryCount * 1000; // 1초 간격으로 증가
+      },
+    });
     // const getMatchList = await this.getCache<Array<string>>('matchesList');
     // const getMatchInfo = await this.getCache<CountAndLength>(
     //   'matchesCountAndLength',

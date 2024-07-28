@@ -42,7 +42,7 @@ import * as redisStore from 'cache-manager-ioredis';
     }),
     HttpModule.registerAsync({
       useFactory: () => ({
-        timeout: 3000,
+        timeout: 5000,
         maxRedirects: 3,
       }),
     }),
