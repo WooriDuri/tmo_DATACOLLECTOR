@@ -18,3 +18,6 @@ summonerId 배열, 카운트 캐싱
 
 summonerIds summoner array
 summonerCountAndLength summoner 카운트 및 길이
+503 에러코드 올때 일정 시간 후 재요청 보내는 로직
+
+match들 반복 => ㅇㅇㅇㅇㅇ????

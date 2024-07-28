@@ -129,6 +129,7 @@ export class AppService implements OnModuleInit {
   async insertRiotData() {
     try {
       console.log(this.called++);
+      //기존 캐시에 저장된 매치리스트 가져오기 무조건 저장되어 있어야함.
       const matches = await this.getCache<Array<string>>('matchesList');
       const getCachedMatchesInfo = await this.getCache<CountAndLength>(
         'matchesCountAndLength',
@@ -143,13 +144,14 @@ export class AppService implements OnModuleInit {
       );
       await this.insertGroupByEvent(timeline);
       getCachedMatchesInfo.count++;
+      await this.saveSummonerIds();
       await this.saveCache('matchesCountAndLength', getCachedMatchesInfo);
       if (getCachedMatchesInfo.count >= getCachedMatchesInfo.length) {
         const summoner = await this.getCache<Array<string>>('summonerIds');
         const puuid = await this.getUserPuuidBySummonerId(summoner);
         await this.getMatchesByPuuid(puuid);
         await this.insertRiotData();
-      } else {
+      } else if (getCachedMatchesInfo.count < getCachedMatchesInfo.length) {
         setTimeout(async () => {
           await this.insertRiotData();
         }, 2000);
@@ -234,10 +236,19 @@ export class AppService implements OnModuleInit {
     return 'Hello World!';
   }
 
+  async saveSummonerIds() {
+    try {
+      const existSummoners = await this.getCache<Array<string>>('summonerIds');
+      return await this.saveCache('summonerIds', existSummoners);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async saveCache(name: string, value: any) {
     try {
       const serializedValue = JSON.stringify(value);
-      return await this.cacheManager.set(name, serializedValue);
+      return await this.cacheManager.set(name, serializedValue, 0);
     } catch (error) {
       console.log(error);
     }

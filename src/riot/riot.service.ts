@@ -42,7 +42,7 @@ export class RiotService {
           .pipe(
             map((response) => {
               if (response.status != 200) {
-                if (response.status === 503) {
+                if (response.status === 503 || response.status === 500) {
                   setTimeout(async () => {
                     await this.getEntries();
                   }, 300 * 1000);
@@ -90,7 +90,7 @@ export class RiotService {
           .pipe(
             map((response) => {
               if (response.status != 200) {
-                if (response.status === 503) {
+                if (response.status === 503 || response.status === 500) {
                   setTimeout(async () => {
                     await this.getPuuid(summonerId);
                   }, 300 * 1000);
@@ -124,7 +124,7 @@ export class RiotService {
           .pipe(
             map((response) => {
               if (response.status != 200) {
-                if (response.status === 503) {
+                if (response.status === 503 || response.status === 500) {
                   setTimeout(async () => {
                     await this.getMatches(puuid);
                   }, 300 * 1000);
@@ -158,7 +158,7 @@ export class RiotService {
           .pipe(
             map((response) => {
               if (response.status != 200) {
-                if (response.status === 503) {
+                if (response.status === 503 || response.status === 500) {
                   setTimeout(async () => {
                     await this.getMatchDetail(matchId);
                   }, 300 * 1000);
@@ -192,7 +192,7 @@ export class RiotService {
           .pipe(
             map((response) => {
               if (response.status != 200) {
-                if (response.status === 503) {
+                if (response.status === 503 || response.status === 500) {
                   setTimeout(async () => {
                     await this.getTimeline(matchId);
                   }, 300 * 1000);
