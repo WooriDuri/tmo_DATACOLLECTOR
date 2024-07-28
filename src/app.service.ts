@@ -130,15 +130,10 @@ export class AppService implements OnModuleInit {
     try {
       console.log(this.called++);
       const matches = await this.getCache<Array<string>>('matchesList');
-      let getCachedMatchesInfo = await this.getCache<CountAndLength>(
+      const getCachedMatchesInfo = await this.getCache<CountAndLength>(
         'matchesCountAndLength',
       );
-      if (!getCachedMatchesInfo) {
-        await this.riotService.getEntries();
-        getCachedMatchesInfo = await this.getCache<CountAndLength>(
-          'matchesCountAndLength',
-        );
-      }
+
       const match = await this.riotService.getMatchDetail(
         matches[getCachedMatchesInfo.count],
       );
@@ -149,17 +144,27 @@ export class AppService implements OnModuleInit {
       await this.insertGroupByEvent(timeline);
       getCachedMatchesInfo.count++;
       await this.saveCache('matchesCountAndLength', getCachedMatchesInfo);
-      if (getCachedMatchesInfo.count < getCachedMatchesInfo.length) {
-        setTimeout(async () => {
-          await this.insertRiotData();
-        }, 2000);
-      } else {
-        //다시 매치정보 가져오기
+      if (getCachedMatchesInfo.count >= getCachedMatchesInfo.length) {
         const summoner = await this.getCache<Array<string>>('summonerIds');
         const puuid = await this.getUserPuuidBySummonerId(summoner);
         await this.getMatchesByPuuid(puuid);
         await this.insertRiotData();
+      } else {
+        setTimeout(async () => {
+          await this.insertRiotData();
+        }, 2000);
       }
+      // if (getCachedMatchesInfo.count < getCachedMatchesInfo.length) {
+      //   setTimeout(async () => {
+      //     await this.insertRiotData();
+      //   }, 2000);
+      // } else {
+      //   //다시 매치정보 가져오기
+      //   const summoner = await this.getCache<Array<string>>('summonerIds');
+      //   const puuid = await this.getUserPuuidBySummonerId(summoner);
+      //   await this.getMatchesByPuuid(puuid);
+      //   await this.insertRiotData();
+      // }
     } catch (error) {
       console.log(error);
     }
