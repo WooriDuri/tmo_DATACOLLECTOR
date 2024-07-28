@@ -57,7 +57,14 @@ export class AppService implements OnModuleInit {
     const getCachedSummoners = await this.getCache<Array<string>>(
       'summonerIds',
     );
-    if (!getCachedSummoners) {
+    const getSummonerCountAndLength = await this.getCache<CountAndLength>(
+      'summonerCountAndLength',
+    );
+    //TODO : summoner 다 사용 했을 때 서버를 다시 킨 경우 생각해야함.
+    if (
+      !getCachedSummoners ||
+      getSummonerCountAndLength.count >= getSummonerCountAndLength.length
+    ) {
       await this.riotService.getEntries();
     }
     const summoner = await this.getCache<Array<string>>('summonerIds');
@@ -72,7 +79,7 @@ export class AppService implements OnModuleInit {
         'summonerCountAndLength',
       );
       if (!getCachedSummonerInfo) {
-        throw new HttpException('summonerCountAndLength is null', 500);
+        await this.riotService.getEntries();
       }
       if (getCachedSummonerInfo.count >= getCachedSummonerInfo.length) {
         await this.riotService.getEntries();
@@ -81,7 +88,7 @@ export class AppService implements OnModuleInit {
           'summonerCountAndLength',
         );
         if (!updatedSummonerInfo) {
-          throw new HttpException('summonerCountAndLength is null', 500);
+          await this.riotService.getEntries();
         }
         const puuid = await this.riotService.getPuuid(
           data[updatedSummonerInfo.count],

@@ -16,6 +16,7 @@ export class RiotService {
   riotApiKey;
   tier;
   tierCount;
+  page;
   constructor(
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
@@ -25,22 +26,27 @@ export class RiotService {
     this.riotApiKey = this.configService.get('RIOT_API_KEY');
     this.tier = ['CHALLENGER', 'GRANDMASTER', 'MASTER', 'DIAMOND'];
     this.tierCount = 0;
+    this.page = 1;
   }
 
   async getEntries() {
     try {
       const queue = `RANKED_SOLO_5x5`;
       const targetTier = this.tier[this.tierCount];
-
       const division = `I`;
       const data = await lastValueFrom(
         this.httpService
           .get(
-            `https://kr.api.riotgames.com/lol/league-exp/v4/entries/${queue}/${targetTier}/${division}?page=1&api_key=${this.riotApiKey}`,
+            `https://kr.api.riotgames.com/lol/league-exp/v4/entries/${queue}/${targetTier}/${division}?page=${this.page}&api_key=${this.riotApiKey}`,
           )
           .pipe(
             map((response) => {
               if (response.status != 200) {
+                if (response.status === 503) {
+                  setTimeout(async () => {
+                    await this.getEntries();
+                  }, 300 * 1000);
+                }
                 if (response.data.error_description) {
                   throw new BadRequestException(
                     response.data.error_description,
@@ -61,6 +67,12 @@ export class RiotService {
       // console.log('cached summonerIds : ', data);
       // console.log(this.tierCount);
       this.tierCount++;
+      if (this.tierCount > 3) {
+        this.tierCount = 0;
+        this.page++;
+      } else if (this.page > 3) {
+        this.page = 1;
+      }
       return data; // array data
     } catch (error) {
       console.log(error);
@@ -78,6 +90,11 @@ export class RiotService {
           .pipe(
             map((response) => {
               if (response.status != 200) {
+                if (response.status === 503) {
+                  setTimeout(async () => {
+                    await this.getPuuid(summonerId);
+                  }, 300 * 1000);
+                }
                 if (response.data.error_description) {
                   throw new BadRequestException(
                     response.data.error_description,
@@ -107,6 +124,11 @@ export class RiotService {
           .pipe(
             map((response) => {
               if (response.status != 200) {
+                if (response.status === 503) {
+                  setTimeout(async () => {
+                    await this.getMatches(puuid);
+                  }, 300 * 1000);
+                }
                 if (response.data.error_description) {
                   throw new BadRequestException(
                     response.data.error_description,
@@ -136,6 +158,11 @@ export class RiotService {
           .pipe(
             map((response) => {
               if (response.status != 200) {
+                if (response.status === 503) {
+                  setTimeout(async () => {
+                    await this.getMatchDetail(matchId);
+                  }, 300 * 1000);
+                }
                 if (response.data.error_description) {
                   throw new BadRequestException(
                     response.data.error_description,
@@ -165,6 +192,11 @@ export class RiotService {
           .pipe(
             map((response) => {
               if (response.status != 200) {
+                if (response.status === 503) {
+                  setTimeout(async () => {
+                    await this.getTimeline(matchId);
+                  }, 300 * 1000);
+                }
                 if (response.data.error_description) {
                   throw new BadRequestException(
                     response.data.error_description,
