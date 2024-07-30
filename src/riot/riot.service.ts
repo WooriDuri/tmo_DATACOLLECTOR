@@ -41,10 +41,12 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
+              if (response.status == 403) {
+                throw new BadRequestException('API KEY EXPIRED');
+              }
               if (response.status == 404) {
                 return this.appService.insertRiotData();
-              }
-              if (response.status != 200) {
+              } else if (response.status != 200) {
                 setTimeout(async () => {
                   await this.getEntries();
                 }, 300 * 1000);
@@ -71,7 +73,6 @@ export class RiotService {
       return data; // array data
     } catch (error) {
       console.log(error);
-      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -84,10 +85,12 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
+              if (response.status == 403) {
+                throw new BadRequestException('API KEY EXPIRED');
+              }
               if (response.status == 404) {
                 return this.appService.insertRiotData();
-              }
-              if (response.status != 200) {
+              } else if (response.status != 200) {
                 setTimeout(async () => {
                   await this.getPuuid(summonerId);
                 }, 300 * 1000);
@@ -100,7 +103,6 @@ export class RiotService {
       return data;
     } catch (error) {
       console.log(error);
-      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -113,10 +115,12 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
+              if (response.status == 403) {
+                throw new BadRequestException('API KEY EXPIRED');
+              }
               if (response.status == 404) {
                 return this.appService.insertRiotData();
-              }
-              if (response.status != 200) {
+              } else if (response.status != 200) {
                 setTimeout(async () => {
                   await this.getMatches(puuid);
                 }, 300 * 1000);
@@ -129,7 +133,6 @@ export class RiotService {
       return data;
     } catch (error) {
       console.log(error);
-      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -142,10 +145,12 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
+              if (response.status == 403) {
+                throw new BadRequestException('API KEY EXPIRED');
+              }
               if (response.status == 404) {
                 return this.appService.insertRiotData();
-              }
-              if (response.status != 200) {
+              } else if (response.status != 200) {
                 setTimeout(async () => {
                   await this.getMatchDetail(matchId);
                 }, 300 * 1000);
@@ -157,7 +162,6 @@ export class RiotService {
       return data; //match.json
     } catch (error) {
       console.log(error);
-      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -170,7 +174,12 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status != 200) {
+              if (response.status == 403) {
+                throw new BadRequestException('API KEY EXPIRED');
+              }
+              if (response.status == 404) {
+                return this.appService.insertRiotData();
+              } else if (response.status != 200) {
                 setTimeout(async () => {
                   await this.getTimeline(matchId);
                 }, 300 * 1000);
@@ -183,7 +192,6 @@ export class RiotService {
       return data; //timeline.json
     } catch (error) {
       console.log(error);
-      throw new HttpException(error, error.status || 500);
     }
   }
 }
