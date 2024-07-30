@@ -24,7 +24,7 @@ export class RiotService {
     private readonly appService: AppService,
   ) {
     this.riotApiKey = this.configService.get('RIOT_API_KEY');
-    this.tier = ['CHALLENGER', 'GRANDMASTER', 'MASTER', 'DIAMOND'];
+    this.tier = ['GRANDMASTER', 'MASTER', 'DIAMOND', 'CHALLENGER'];
     this.tierCount = 0;
     this.page = 1;
   }
@@ -41,20 +41,15 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status != 200) {
-                if (response.status === 503 || response.status === 500) {
-                  setTimeout(async () => {
-                    await this.getEntries();
-                  }, 300 * 1000);
-                }
-                if (response.data.error_description) {
-                  throw new BadRequestException(
-                    response.data.error_description,
-                  );
-                } else {
-                  throw new BadRequestException();
-                }
+              if (response.status == 404) {
+                return this.appService.insertRiotData();
               }
+              if (response.status != 200) {
+                setTimeout(async () => {
+                  await this.getEntries();
+                }, 300 * 1000);
+              }
+
               return response.data.map((entry: any) => entry.summonerId);
             }),
           ),
@@ -89,20 +84,15 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status != 200) {
-                if (response.status === 503 || response.status === 500) {
-                  setTimeout(async () => {
-                    await this.getPuuid(summonerId);
-                  }, 300 * 1000);
-                }
-                if (response.data.error_description) {
-                  throw new BadRequestException(
-                    response.data.error_description,
-                  );
-                } else {
-                  throw new BadRequestException();
-                }
+              if (response.status == 404) {
+                return this.appService.insertRiotData();
               }
+              if (response.status != 200) {
+                setTimeout(async () => {
+                  await this.getPuuid(summonerId);
+                }, 300 * 1000);
+              }
+
               return response.data.puuid;
             }),
           ),
@@ -123,20 +113,15 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status != 200) {
-                if (response.status === 503 || response.status === 500) {
-                  setTimeout(async () => {
-                    await this.getMatches(puuid);
-                  }, 300 * 1000);
-                }
-                if (response.data.error_description) {
-                  throw new BadRequestException(
-                    response.data.error_description,
-                  );
-                } else {
-                  throw new BadRequestException();
-                }
+              if (response.status == 404) {
+                return this.appService.insertRiotData();
               }
+              if (response.status != 200) {
+                setTimeout(async () => {
+                  await this.getMatches(puuid);
+                }, 300 * 1000);
+              }
+
               return response.data;
             }),
           ),
@@ -157,19 +142,13 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
+              if (response.status == 404) {
+                return this.appService.insertRiotData();
+              }
               if (response.status != 200) {
-                if (response.status === 503 || response.status === 500) {
-                  setTimeout(async () => {
-                    await this.getMatchDetail(matchId);
-                  }, 300 * 1000);
-                }
-                if (response.data.error_description) {
-                  throw new BadRequestException(
-                    response.data.error_description,
-                  );
-                } else {
-                  throw new BadRequestException();
-                }
+                setTimeout(async () => {
+                  await this.getMatchDetail(matchId);
+                }, 300 * 1000);
               }
               return response.data;
             }),
@@ -192,19 +171,11 @@ export class RiotService {
           .pipe(
             map((response) => {
               if (response.status != 200) {
-                if (response.status === 503 || response.status === 500) {
-                  setTimeout(async () => {
-                    await this.getTimeline(matchId);
-                  }, 300 * 1000);
-                }
-                if (response.data.error_description) {
-                  throw new BadRequestException(
-                    response.data.error_description,
-                  );
-                } else {
-                  throw new BadRequestException();
-                }
+                setTimeout(async () => {
+                  await this.getTimeline(matchId);
+                }, 300 * 1000);
               }
+
               return response.data;
             }),
           ),

@@ -46,14 +46,6 @@ export class AppService implements OnModuleInit {
         return retryCount * 1000; // 1초 간격으로 증가
       },
     });
-    // const getMatchList = await this.getCache<Array<string>>('matchesList');
-    // const getMatchInfo = await this.getCache<CountAndLength>(
-    //   'matchesCountAndLength',
-    // );
-    // console.log(getMatchList);
-    // console.log(getMatchList[getMatchInfo.count - 1]);
-    // console.log(getMatchList[getMatchInfo.count]);
-    // console.log(getMatchInfo);
     const getCachedSummoners = await this.getCache<Array<string>>(
       'summonerIds',
     );
@@ -156,17 +148,6 @@ export class AppService implements OnModuleInit {
           await this.insertRiotData();
         }, 2000);
       }
-      // if (getCachedMatchesInfo.count < getCachedMatchesInfo.length) {
-      //   setTimeout(async () => {
-      //     await this.insertRiotData();
-      //   }, 2000);
-      // } else {
-      //   //다시 매치정보 가져오기
-      //   const summoner = await this.getCache<Array<string>>('summonerIds');
-      //   const puuid = await this.getUserPuuidBySummonerId(summoner);
-      //   await this.getMatchesByPuuid(puuid);
-      //   await this.insertRiotData();
-      // }
     } catch (error) {
       console.log(error);
     }
@@ -274,19 +255,4 @@ export class AppService implements OnModuleInit {
       console.log(error);
     }
   }
-  // async saveCache(name: string, value: any) {
-  //   try {
-  //     return await this.cacheManager.set(name, value);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-
-  // async getCache(name: string) {
-  //   try {
-  //     return await this.cacheManager.get(name);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
 }
