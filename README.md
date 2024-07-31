@@ -68,8 +68,7 @@ docker exec -it redis redis-cli
 
 ### DB
 
-<img>
-![alt text](<스크린샷 2024-07-29 오후 9.06.16.png>)
+![alt text](/db.png)
 
 ### 이슈
 
