@@ -24,7 +24,7 @@ export class RiotService {
     private readonly appService: AppService,
   ) {
     this.riotApiKey = this.configService.get('RIOT_API_KEY');
-    this.tier = ['GRANDMASTER', 'MASTER', 'DIAMOND', 'CHALLENGER'];
+    this.tier = ['CHALLENGER', 'GRANDMASTER', 'MASTER', 'DIAMOND'];
     this.tierCount = 0;
     this.page = 1;
   }
@@ -41,10 +41,7 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status == 403) {
-                throw new BadRequestException('API KEY EXPIRED');
-              }
-              if (response.status == 404) {
+              if (response.status === 404) {
                 return this.appService.insertRiotData();
               } else if (response.status != 200) {
                 setTimeout(async () => {
@@ -59,10 +56,6 @@ export class RiotService {
       await this.appService.saveCache('summonerIds', data);
       const countAndLength: CountAndLength = { count: 0, length: data.length };
       await this.appService.saveCache('summonerCountAndLength', countAndLength);
-      // const test = await this.appService.getCache('summonerCountAndLength');
-      // console.log('test : ', test);
-      // console.log('cached summonerIds : ', data);
-      // console.log(this.tierCount);
       this.tierCount++;
       if (this.tierCount > 3) {
         this.tierCount = 0;
@@ -85,10 +78,7 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status == 403) {
-                throw new BadRequestException('API KEY EXPIRED');
-              }
-              if (response.status == 404) {
+              if (response.status === 404) {
                 return this.appService.insertRiotData();
               } else if (response.status != 200) {
                 setTimeout(async () => {
@@ -115,10 +105,7 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status == 403) {
-                throw new BadRequestException('API KEY EXPIRED');
-              }
-              if (response.status == 404) {
+              if (response.status === 404) {
                 return this.appService.insertRiotData();
               } else if (response.status != 200) {
                 setTimeout(async () => {
@@ -145,10 +132,7 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status == 403) {
-                throw new BadRequestException('API KEY EXPIRED');
-              }
-              if (response.status == 404) {
+              if (response.status === 404) {
                 return this.appService.insertRiotData();
               } else if (response.status != 200) {
                 setTimeout(async () => {
@@ -174,9 +158,6 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status == 403) {
-                throw new BadRequestException('API KEY EXPIRED');
-              }
               if (response.status == 404) {
                 return this.appService.insertRiotData();
               } else if (response.status != 200) {

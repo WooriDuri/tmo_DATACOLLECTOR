@@ -46,6 +46,7 @@ export class AppService implements OnModuleInit {
         return retryCount * 1000; // 1초 간격으로 증가
       },
     });
+    //* 첫 시작시 주석 필요 시작라인
     const getCachedSummoners = await this.getCache<Array<string>>(
       'summonerIds',
     );
@@ -62,7 +63,7 @@ export class AppService implements OnModuleInit {
     const summoner = await this.getCache<Array<string>>('summonerIds');
     const puuid = await this.getUserPuuidBySummonerId(summoner);
     const matches = await this.getMatchesByPuuid(puuid);
-    await this.insertRiotData(); // 반복시켜야함.
+    await this.insertRiotData(); //* 첫 시작시 주석필요 마지막 라인
   }
 
   async getUserPuuidBySummonerId(data: any[]) {

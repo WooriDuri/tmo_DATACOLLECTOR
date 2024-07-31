@@ -9,12 +9,7 @@ const fs = require('fs');
 async function bootstrap() {
   const options = {};
   // const app = await NestFactory.create(AppModule);
-  if (process.env.LOCAL === 'true') {
-    options['httpsOptions'] = {
-      key: fs.readFileSync('.cert/key.pem', 'utf-8'),
-      cert: fs.readFileSync('.cert/cert.pem', 'utf-8'),
-    };
-  }
+
   const app = await NestFactory.create(AppModule, options);
   app.useGlobalFilters(new HttpExceptionFilter());
 
