@@ -41,7 +41,9 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status === 404) {
+              if (response.status === 403) {
+                throw new BadRequestException('API KEY가 만료되었습니다.');
+              } else if (response.status === 404) {
                 return this.appService.insertRiotData();
               } else if (response.status != 200) {
                 setTimeout(async () => {
@@ -66,6 +68,7 @@ export class RiotService {
       return data; // array data
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -78,7 +81,9 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status === 404) {
+              if (response.status === 403) {
+                throw new BadRequestException('API KEY가 만료되었습니다.');
+              } else if (response.status === 404) {
                 return this.appService.insertRiotData();
               } else if (response.status != 200) {
                 setTimeout(async () => {
@@ -93,6 +98,7 @@ export class RiotService {
       return data;
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -105,7 +111,9 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status === 404) {
+              if (response.status === 403) {
+                throw new BadRequestException('API KEY가 만료되었습니다.');
+              } else if (response.status === 404) {
                 return this.appService.insertRiotData();
               } else if (response.status != 200) {
                 setTimeout(async () => {
@@ -120,6 +128,7 @@ export class RiotService {
       return data;
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -132,7 +141,9 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status === 404) {
+              if (response.status === 403) {
+                throw new BadRequestException('API KEY가 만료되었습니다.');
+              } else if (response.status === 404) {
                 return this.appService.insertRiotData();
               } else if (response.status != 200) {
                 setTimeout(async () => {
@@ -146,6 +157,7 @@ export class RiotService {
       return data; //match.json
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -158,7 +170,9 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status == 404) {
+              if (response.status === 403) {
+                throw new BadRequestException('API KEY가 만료되었습니다.');
+              } else if (response.status == 404) {
                 return this.appService.insertRiotData();
               } else if (response.status != 200) {
                 setTimeout(async () => {
@@ -173,6 +187,7 @@ export class RiotService {
       return data; //timeline.json
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 }

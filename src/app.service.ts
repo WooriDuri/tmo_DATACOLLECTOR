@@ -55,7 +55,6 @@ export class AppService implements OnModuleInit {
     );
     //TODO : summoner 다 사용 했을 때 서버를 다시 킨 경우 생각해야함.
     if (
-      getCachedSummoners == null ||
       !getCachedSummoners ||
       getSummonerCountAndLength.count >= getSummonerCountAndLength.length
     ) {
@@ -129,9 +128,11 @@ export class AppService implements OnModuleInit {
         'matchesCountAndLength',
       );
       if (
-        getCachedMatchesInfo.count >= getCachedMatchesInfo.length ||
+        !matches ||
         matches == null ||
-        getCachedMatchesInfo == null
+        !getCachedMatchesInfo ||
+        getCachedMatchesInfo == null ||
+        getCachedMatchesInfo.count >= getCachedMatchesInfo.length
       ) {
         const summoner = await this.getCache<Array<string>>('summonerIds');
         const puuid = await this.getUserPuuidBySummonerId(summoner);
