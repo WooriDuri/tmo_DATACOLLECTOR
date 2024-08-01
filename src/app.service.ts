@@ -55,6 +55,7 @@ export class AppService implements OnModuleInit {
     );
     //TODO : summoner 다 사용 했을 때 서버를 다시 킨 경우 생각해야함.
     if (
+      getCachedSummoners == null ||
       !getCachedSummoners ||
       getSummonerCountAndLength.count >= getSummonerCountAndLength.length
     ) {
@@ -62,7 +63,7 @@ export class AppService implements OnModuleInit {
     }
     const summoner = await this.getCache<Array<string>>('summonerIds');
     const puuid = await this.getUserPuuidBySummonerId(summoner);
-    const matches = await this.getMatchesByPuuid(puuid);
+    await this.getMatchesByPuuid(puuid);
     await this.insertRiotData(); //* 첫 시작시 주석필요 마지막 라인
   }
 
@@ -71,7 +72,7 @@ export class AppService implements OnModuleInit {
       const getCachedSummonerInfo = await this.getCache<CountAndLength>(
         'summonerCountAndLength',
       );
-      if (!getCachedSummonerInfo) {
+      if (!getCachedSummonerInfo || getCachedSummonerInfo == null) {
         await this.riotService.getEntries();
       }
       if (getCachedSummonerInfo.count >= getCachedSummonerInfo.length) {
@@ -80,7 +81,7 @@ export class AppService implements OnModuleInit {
         const updatedSummonerInfo = await this.getCache<CountAndLength>(
           'summonerCountAndLength',
         );
-        if (!updatedSummonerInfo) {
+        if (!updatedSummonerInfo || updatedSummonerInfo == null) {
           await this.riotService.getEntries();
         }
         const puuid = await this.riotService.getPuuid(
@@ -127,7 +128,15 @@ export class AppService implements OnModuleInit {
       const getCachedMatchesInfo = await this.getCache<CountAndLength>(
         'matchesCountAndLength',
       );
-
+      if (
+        getCachedMatchesInfo.count >= getCachedMatchesInfo.length ||
+        matches == null ||
+        getCachedMatchesInfo == null
+      ) {
+        const summoner = await this.getCache<Array<string>>('summonerIds');
+        const puuid = await this.getUserPuuidBySummonerId(summoner);
+        await this.getMatchesByPuuid(puuid);
+      }
       const match = await this.riotService.getMatchDetail(
         matches[getCachedMatchesInfo.count],
       );
@@ -139,23 +148,17 @@ export class AppService implements OnModuleInit {
       getCachedMatchesInfo.count++;
       await this.saveSummonerIds();
       await this.saveCache('matchesCountAndLength', getCachedMatchesInfo);
-      if (getCachedMatchesInfo.count >= getCachedMatchesInfo.length) {
-        const summoner = await this.getCache<Array<string>>('summonerIds');
-        const puuid = await this.getUserPuuidBySummonerId(summoner);
-        await this.getMatchesByPuuid(puuid);
+
+      return setTimeout(async () => {
         await this.insertRiotData();
-      } else if (getCachedMatchesInfo.count < getCachedMatchesInfo.length) {
-        setTimeout(async () => {
-          await this.insertRiotData();
-        }, 2000);
-      }
+      }, 2000);
     } catch (error) {
       console.log(error);
     }
   }
 
   //* 아이템, 스킬 데이터 삽입
-  async insertGroupByEvent(timelineData: any) {
+  async insertGroupByEvent(timelineData: any): Promise<any> {
     try {
       const allEvents = timelineData.info.frames.reduce(
         (acc, frame) => acc.concat(frame.events),
