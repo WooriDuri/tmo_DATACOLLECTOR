@@ -32,20 +32,20 @@ export class AppService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    const axiosInstance = this.httpService.axiosRef;
+    // const axiosInstance = this.httpService.axiosRef;
 
-    // axios-retry 설정
-    axiosRetry(axiosInstance, {
-      retries: 3, // 재시도 횟수
-      retryCondition: (error) => {
-        // 재시도 조건
-        return error.code === 'ECONNABORTED' || error.response?.status >= 500;
-      },
-      retryDelay: (retryCount) => {
-        // 재시도 딜레이 (기본은 0)
-        return retryCount * 1000; // 1초 간격으로 증가
-      },
-    });
+    // // axios-retry 설정
+    // axiosRetry(axiosInstance, {
+    //   retries: 3, // 재시도 횟수
+    //   retryCondition: (error) => {
+    //     // 재시도 조건
+    //     return error.code === 'ECONNABORTED' || error.response?.status >= 500;
+    //   },
+    //   retryDelay: (retryCount) => {
+    //     // 재시도 딜레이 (기본은 0)
+    //     return retryCount * 1000; // 1초 간격으로 증가
+    //   },
+    // });
     //* 첫 시작시 주석 필요 시작라인
     const getCachedSummoners = await this.getCache<Array<string>>(
       'summonerIds',
@@ -63,6 +63,7 @@ export class AppService implements OnModuleInit {
     const summoner = await this.getCache<Array<string>>('summonerIds');
     const puuid = await this.getUserPuuidBySummonerId(summoner);
     await this.getMatchesByPuuid(puuid);
+    console.log('start');
     await this.insertRiotData(); //* 첫 시작시 주석필요 마지막 라인
   }
 
@@ -99,6 +100,7 @@ export class AppService implements OnModuleInit {
       }
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -115,6 +117,7 @@ export class AppService implements OnModuleInit {
       return matchesList;
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -127,6 +130,21 @@ export class AppService implements OnModuleInit {
       const getCachedMatchesInfo = await this.getCache<CountAndLength>(
         'matchesCountAndLength',
       );
+
+      const match = await this.riotService.getMatchDetail(
+        matches[getCachedMatchesInfo.count],
+      );
+
+      await this.insertParticipantData(match);
+      const timeline = await this.riotService.getTimeline(
+        matches[getCachedMatchesInfo.count],
+      );
+
+      await this.insertGroupByEvent(timeline);
+      getCachedMatchesInfo.count++;
+      await this.saveSummonerIds();
+      await this.saveCache('matchesCountAndLength', getCachedMatchesInfo);
+
       if (
         !matches ||
         matches == null ||
@@ -135,26 +153,18 @@ export class AppService implements OnModuleInit {
         getCachedMatchesInfo.count >= getCachedMatchesInfo.length
       ) {
         const summoner = await this.getCache<Array<string>>('summonerIds');
+        if (!summoner) {
+          await this.riotService.getEntries();
+        }
         const puuid = await this.getUserPuuidBySummonerId(summoner);
         await this.getMatchesByPuuid(puuid);
-      }
-      const match = await this.riotService.getMatchDetail(
-        matches[getCachedMatchesInfo.count],
-      );
-      await this.insertParticipantData(match);
-      const timeline = await this.riotService.getTimeline(
-        matches[getCachedMatchesInfo.count],
-      );
-      await this.insertGroupByEvent(timeline);
-      getCachedMatchesInfo.count++;
-      await this.saveSummonerIds();
-      await this.saveCache('matchesCountAndLength', getCachedMatchesInfo);
-
-      return setTimeout(async () => {
         await this.insertRiotData();
-      }, 2000);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      return await this.insertRiotData();
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -192,6 +202,7 @@ export class AppService implements OnModuleInit {
       return groupedEvents;
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -215,6 +226,7 @@ export class AppService implements OnModuleInit {
       // console.log(test);
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -228,6 +240,7 @@ export class AppService implements OnModuleInit {
       return await this.saveCache('summonerIds', existSummoners);
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 
@@ -237,6 +250,7 @@ export class AppService implements OnModuleInit {
       return await this.cacheManager.set(name, serializedValue, 0);
     } catch (error) {
       console.log(error);
+      throw new HttpException(error, error.status || 500);
     }
   }
 

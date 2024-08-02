@@ -7,7 +7,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { lastValueFrom, map } from 'rxjs';
+import { catchError, lastValueFrom, map } from 'rxjs';
 import { AppService } from 'src/app.service';
 import { CountAndLength } from 'src/common/interface';
 
@@ -41,20 +41,33 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status === 403) {
-                throw new BadRequestException('API KEY가 만료되었습니다.');
-              } else if (response.status === 404) {
-                return this.appService.insertRiotData();
-              } else if (response.status != 200) {
-                setTimeout(async () => {
-                  await this.getEntries();
-                }, 300 * 1000);
+              if (response.status != 200) {
+                if (response.data.error_description) {
+                  throw new BadRequestException(
+                    response.data.error_description,
+                  );
+                } else {
+                  throw new BadRequestException();
+                }
               }
-
               return response.data.map((entry: any) => entry.summonerId);
+            }),
+            catchError((error) => {
+              console.log(error);
+              return error;
             }),
           ),
       );
+      if (data.status || data.status === 403) {
+        throw new BadRequestException('api key expired');
+      } else if (data.status || data.status === 404) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        return await this.appService.insertRiotData();
+      } else if (data.status || data.status == 429) {
+        await new Promise((resolve) => setTimeout(resolve, 300 * 1000));
+        return await this.getEntries();
+      }
+
       await this.appService.saveCache('summonerIds', data);
       const countAndLength: CountAndLength = { count: 0, length: data.length };
       await this.appService.saveCache('summonerCountAndLength', countAndLength);
@@ -81,20 +94,34 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status === 403) {
-                throw new BadRequestException('API KEY가 만료되었습니다.');
-              } else if (response.status === 404) {
-                return this.appService.insertRiotData();
-              } else if (response.status != 200) {
-                setTimeout(async () => {
-                  await this.getPuuid(summonerId);
-                }, 300 * 1000);
+              if (response.status != 200) {
+                if (response.data.error_description) {
+                  throw new BadRequestException(
+                    response.data.error_description,
+                  );
+                } else {
+                  throw new BadRequestException();
+                }
               }
-
               return response.data.puuid;
+            }),
+            catchError(async (error) => {
+              console.log(error);
+              return error;
             }),
           ),
       );
+      if (data.status || data.status === 403) {
+        throw new BadRequestException('api key expired');
+      } else if (data.status || data.status === 404) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        return await this.appService.insertRiotData();
+      } else if (data.status || data.status == 429) {
+        await new Promise((resolve) => setTimeout(resolve, 300 * 1000));
+        // setTimeout(async () => {
+        return await this.getPuuid(summonerId);
+        // }, 300 * 1000);
+      }
       return data;
     } catch (error) {
       console.log(error);
@@ -111,20 +138,34 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status === 403) {
-                throw new BadRequestException('API KEY가 만료되었습니다.');
-              } else if (response.status === 404) {
-                return this.appService.insertRiotData();
-              } else if (response.status != 200) {
-                setTimeout(async () => {
-                  await this.getMatches(puuid);
-                }, 300 * 1000);
+              if (response.status != 200) {
+                if (response.data.error_description) {
+                  throw new BadRequestException(
+                    response.data.error_description,
+                  );
+                } else {
+                  throw new BadRequestException();
+                }
               }
-
               return response.data;
+            }),
+            catchError(async (error) => {
+              console.log(error);
+              return error;
             }),
           ),
       );
+      if (data.status || data.status === 403) {
+        throw new BadRequestException('api key expired');
+      } else if (data.status || data.status === 404) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        return await this.appService.insertRiotData();
+      } else if (data.status || data.status == 429) {
+        await new Promise((resolve) => setTimeout(resolve, 300 * 1000));
+        // setTimeout(async () => {
+        return await this.getMatches(puuid);
+        // }, 300 * 1000);
+      }
       return data;
     } catch (error) {
       console.log(error);
@@ -141,19 +182,34 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status === 403) {
-                throw new BadRequestException('API KEY가 만료되었습니다.');
-              } else if (response.status === 404) {
-                return this.appService.insertRiotData();
-              } else if (response.status != 200) {
-                setTimeout(async () => {
-                  await this.getMatchDetail(matchId);
-                }, 300 * 1000);
+              if (response.status != 200) {
+                if (response.data.error_description) {
+                  throw new BadRequestException(
+                    response.data.error_description,
+                  );
+                } else {
+                  throw new BadRequestException();
+                }
               }
               return response.data;
             }),
+            catchError(async (error) => {
+              console.log(error);
+              return error;
+            }),
           ),
       );
+      if (data.status || data.status === 403) {
+        throw new BadRequestException('api key expired');
+      } else if (data.status || data.status === 404) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        return await this.appService.insertRiotData();
+      } else if (data.status || data.status == 429) {
+        await new Promise((resolve) => setTimeout(resolve, 300 * 1000));
+        // setTimeout(async () => {
+        return await this.getMatchDetail(matchId);
+        // }, 300 * 1000);
+      }
       return data; //match.json
     } catch (error) {
       console.log(error);
@@ -170,20 +226,34 @@ export class RiotService {
           )
           .pipe(
             map((response) => {
-              if (response.status === 403) {
-                throw new BadRequestException('API KEY가 만료되었습니다.');
-              } else if (response.status == 404) {
-                return this.appService.insertRiotData();
-              } else if (response.status != 200) {
-                setTimeout(async () => {
-                  await this.getTimeline(matchId);
-                }, 300 * 1000);
+              if (response.status != 200) {
+                if (response.data.error_description) {
+                  throw new BadRequestException(
+                    response.data.error_description,
+                  );
+                } else {
+                  throw new BadRequestException();
+                }
               }
-
               return response.data;
+            }),
+            catchError(async (error) => {
+              console.log(error);
+              return error;
             }),
           ),
       );
+      if (data.status || data.status === 403) {
+        throw new BadRequestException('api key expired');
+      } else if (data.status || data.status === 404) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        return await this.appService.insertRiotData();
+      } else if (data.status || data.status == 429) {
+        await new Promise((resolve) => setTimeout(resolve, 300 * 1000));
+        // setTimeout(async () => {
+        return await this.getTimeline(matchId);
+        // }, 300 * 1000);
+      }
       return data; //timeline.json
     } catch (error) {
       console.log(error);
